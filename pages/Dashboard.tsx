@@ -6,15 +6,12 @@ import {
   Trash2, Edit3, ReceiptIndianRupee, 
   Zap, ArrowDownCircle, Info, AlertCircle, Layers, Banknote
 } from 'lucide-react';
-// Fix: Bypassing framer-motion type errors by casting to any
-import { motion as motionBase, AnimatePresence as AnimatePresenceBase } from 'framer-motion';
-const motion = motionBase as any;
-const AnimatePresence = AnimatePresenceBase as any;
+// @ts-ignore
+import { motion, AnimatePresence } from 'framer-motion';
 import { Loan, LoanType, Lender, Payment } from '../types';
 import { useTranslation } from '../App';
-// Fix: Bypassing react-router-dom type errors by casting to any
-import * as ReactRouterDOM from 'react-router-dom';
-const { Link } = ReactRouterDOM as any;
+// @ts-ignore
+import { Link } from 'react-router-dom';
 import { db, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, where, auth } from '../firebase';
 
 interface DashboardProps {
@@ -165,7 +162,7 @@ const Dashboard: React.FC<DashboardProps> = ({ loans, lenders }) => {
         ))}
       </div>
 
-      {/* Recent Activity - Fixed Container Visibility */}
+      {/* Recent Activity */}
       <div className="flex-grow flex flex-col bg-white/60 backdrop-blur-2xl p-8 rounded-[3.5rem] border-2 border-white shadow-[0_40px_80px_-30px_rgba(6,78,59,0.1)] z-10 overflow-hidden min-h-0">
         <div className="flex items-center justify-between mb-8 shrink-0 px-2">
           <div className="flex items-center gap-3">
@@ -201,7 +198,6 @@ const Dashboard: React.FC<DashboardProps> = ({ loans, lenders }) => {
                   <p className="text-lg font-black text-slate-900 tracking-tighter leading-none">₹{(loan.totalAmount - loan.paidAmount).toLocaleString('en-IN')}</p>
                 </div>
                 
-                {/* DIRECT PAYMENT ICON ON LIST */}
                 <button 
                   onClick={() => { setSelectedLoanId(loan.id); setIsAddPaymentFormOpen(true); }}
                   className="tactile-icon !w-10 !h-10 !rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all border-emerald-100"
@@ -212,67 +208,59 @@ const Dashboard: React.FC<DashboardProps> = ({ loans, lenders }) => {
               </div>
             </motion.div>
           ))}
-
-          {stats.recentActivity.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 text-center opacity-10">
-              <Layers size={48} strokeWidth={1} className="mb-4" />
-              <p className="text-[10px] font-black uppercase tracking-[0.3em]">Vault is Currently Empty</p>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* History Modal - Refined Size */}
+      {/* REFINED COMPACT History Modal */}
       <AnimatePresence>
         {isHistoryModalOpen && selectedLoan && (
           <div className="modal-overlay" onClick={() => setIsHistoryModalOpen(false)}>
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} onClick={(e: any) => e.stopPropagation()} className="modal-content !max-w-[400px] !p-0 overflow-hidden !rounded-[3.5rem] border-0 shadow-3xl max-h-[82vh] flex flex-col">
-              <div className="bg-[#0f172a] p-6 pb-4 text-white relative shrink-0">
-                <div className="flex justify-between items-start mb-4 relative z-10">
-                  <div className="tactile-icon active !w-11 !h-11 !rounded-2xl bg-emerald-500 shadow-lg border-0"><ReceiptIndianRupee size={20} strokeWidth={2.5} /></div>
-                  <button onClick={() => setIsHistoryModalOpen(false)} className="w-9 h-9 bg-white/10 rounded-2xl flex items-center justify-center hover:bg-white/20 transition-all active:scale-95"><X size={16} strokeWidth={3} /></button>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} onClick={(e: any) => e.stopPropagation()} className="modal-content !max-w-[380px] !p-0 overflow-hidden !rounded-[3rem] border-0 shadow-3xl max-h-[75vh] flex flex-col">
+              <div className="bg-[#0f172a] p-5 pb-3 text-white relative shrink-0">
+                <div className="flex justify-between items-start mb-3 relative z-10">
+                  <div className="tactile-icon active !w-10 !h-10 !rounded-xl bg-emerald-500 shadow-lg border-0"><ReceiptIndianRupee size={18} strokeWidth={2.5} /></div>
+                  <button onClick={() => setIsHistoryModalOpen(false)} className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all active:scale-95"><X size={14} strokeWidth={3} /></button>
                 </div>
-                <div className="relative z-10 px-2">
-                  <h2 className="text-2xl font-black tracking-tighter truncate leading-none lowercase mb-1.5">{selectedLoan.lenderName}</h2>
-                  <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[7px] font-black text-emerald-400 uppercase tracking-widest mb-3">ACTIVE ACCOUNT</div>
-                  <div className="p-4 bg-[#1e293b]/50 backdrop-blur-xl rounded-[2rem] border border-white/5 shadow-2xl">
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5">Balance Amount</p>
-                    <p className="text-3xl font-black tracking-tighter text-emerald-400 leading-none">₹{(selectedLoan.totalAmount - (selectedLoan.paidAmount || 0)).toLocaleString('en-IN')}</p>
+                <div className="relative z-10 px-1">
+                  <h2 className="text-xl font-black tracking-tighter truncate leading-none lowercase mb-1">{selectedLoan.lenderName}</h2>
+                  <div className="inline-block px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[6px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-3">ACTIVE ACCOUNT</div>
+                  <div className="p-3.5 bg-[#1e293b]/50 backdrop-blur-xl rounded-[1.8rem] border border-white/5 shadow-2xl">
+                    <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5">Balance Amount</p>
+                    <p className="text-2xl font-black tracking-tighter text-emerald-400 leading-none">₹{(selectedLoan.totalAmount - (selectedLoan.paidAmount || 0)).toLocaleString('en-IN')}</p>
                   </div>
                 </div>
               </div>
               
-              <div className="p-6 bg-white flex flex-col flex-grow min-h-0">
-                <div className="flex justify-between items-center mb-4 shrink-0 px-1">
-                  <div className="flex items-center gap-2">
-                    <History size={14} className="text-slate-300" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-900">Recent History</span>
+              <div className="p-5 bg-white flex flex-col flex-grow min-h-0">
+                <div className="flex justify-between items-center mb-3 shrink-0 px-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <History size={12} className="text-slate-300" />
+                    <span className="text-[8px] font-black uppercase tracking-[0.15em] text-slate-900">Recent History</span>
                   </div>
-                  {/* COMPACT RECORD PAYMENT BUTTON */}
-                  <button onClick={() => setIsAddPaymentFormOpen(true)} className="primary-btn !h-8 !rounded-xl !px-4 text-[8px] shadow-emerald-500/20">
-                    <Plus size={12} strokeWidth={3} /> RECORD PAYMENT
+                  <button onClick={() => setIsAddPaymentFormOpen(true)} className="primary-btn !h-7 !rounded-lg !px-3 text-[7px] shadow-emerald-500/20">
+                    <Plus size={10} strokeWidth={3} /> RECORD PAYMENT
                   </button>
                 </div>
                 
-                <div className="flex-grow overflow-y-auto custom-scrollbar pr-2 space-y-2.5 min-h-0">
+                <div className="flex-grow overflow-y-auto custom-scrollbar pr-1.5 space-y-2 min-h-0">
                   {payments.length === 0 ? (
-                    <div className="py-16 text-center opacity-10 flex flex-col items-center">
-                      <ArrowDownCircle size={32} className="mb-3" />
-                      <p className="text-[9px] font-black uppercase tracking-widest">No History Yet</p>
+                    <div className="py-12 text-center opacity-10 flex flex-col items-center">
+                      <ArrowDownCircle size={28} className="mb-2" />
+                      <p className="text-[8px] font-black uppercase tracking-widest">No History Yet</p>
                     </div>
                   ) : (
                     payments.map(p => (
-                      <div key={p.id} className="flex justify-between items-center p-3.5 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-all group">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-emerald-500 shadow-sm"><Zap size={14} fill="currentColor" /></div>
+                      <div key={p.id} className="flex justify-between items-center p-3 bg-slate-50/50 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all group">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-emerald-500 shadow-sm"><Zap size={12} fill="currentColor" /></div>
                           <div>
-                            <p className="text-xs font-black text-slate-900">₹{p.amount.toLocaleString('en-IN')}</p>
-                            <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">{new Date(p.date).toLocaleDateString('en-GB')} • {p.note || 'RE'}</p>
+                            <p className="text-[11px] font-black text-slate-900">₹{p.amount.toLocaleString('en-IN')}</p>
+                            <p className="text-[6px] font-bold text-slate-400 uppercase tracking-widest">{new Date(p.date).toLocaleDateString('en-GB')} • {p.note || 'RE'}</p>
                           </div>
                         </div>
-                        <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => { setEditingPayment(p); setPaymentData({ amount: p.amount, date: p.date, note: p.note || '' }); setIsAddPaymentFormOpen(true); }} className="p-1.5 text-slate-400 hover:text-emerald-600"><Edit3 size={13} /></button>
-                          <button onClick={() => handleDeletePayment(p)} className="p-1.5 text-slate-400 hover:text-red-500"><Trash2 size={13} /></button>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => { setEditingPayment(p); setPaymentData({ amount: p.amount, date: p.date, note: p.note || '' }); setIsAddPaymentFormOpen(true); }} className="p-1 text-slate-300 hover:text-emerald-600"><Edit3 size={11} /></button>
+                          <button onClick={() => handleDeletePayment(p)} className="p-1 text-slate-300 hover:text-red-500"><Trash2 size={11} /></button>
                         </div>
                       </div>
                     ))
@@ -288,37 +276,33 @@ const Dashboard: React.FC<DashboardProps> = ({ loans, lenders }) => {
       <AnimatePresence>
         {isAddPaymentFormOpen && (
           <div className="modal-overlay z-[120]" onClick={() => setIsAddPaymentFormOpen(false)}>
-            <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} onClick={(e: any) => e.stopPropagation()} className="modal-content !max-w-[360px] !rounded-[3rem] !p-8 shadow-3xl text-center">
-              <div className="flex flex-col items-center mb-8">
-                <div className="tactile-icon active !w-14 !h-14 !rounded-[1.4rem] mb-4 bg-emerald-500 text-white border-0 shadow-emerald-500/40"><Banknote size={24} strokeWidth={2.5} /></div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tighter leading-none mb-1">Record Entry</h3>
-                <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em]">{selectedLoan?.lenderName || 'Source Registry'}</p>
+            <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} onClick={(e: any) => e.stopPropagation()} className="modal-content !max-w-[340px] !rounded-[2.5rem] !p-6 shadow-3xl text-center">
+              <div className="flex flex-col items-center mb-6">
+                <div className="tactile-icon active !w-12 !h-12 !rounded-xl mb-3 bg-emerald-500 text-white border-0 shadow-emerald-500/40"><Banknote size={20} strokeWidth={2.5} /></div>
+                <h3 className="text-xl font-black text-slate-900 tracking-tighter leading-none mb-1">Record Entry</h3>
+                <p className="text-[8px] font-black text-emerald-500 uppercase tracking-[0.2em]">{selectedLoan?.lenderName || 'Source Registry'}</p>
               </div>
 
               {formError && (
-                <div className="mb-6 p-3 bg-red-50 text-red-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-red-100 flex items-center justify-center gap-2"><AlertCircle size={14} /> {formError}</div>
+                <div className="mb-4 p-2 bg-red-50 text-red-600 rounded-lg text-[8px] font-black uppercase tracking-widest border border-red-100 flex items-center justify-center gap-1.5"><AlertCircle size={12} /> {formError}</div>
               )}
 
-              <form onSubmit={handleAddPayment} className="space-y-6 text-left">
+              <form onSubmit={handleAddPayment} className="space-y-4 text-left">
                 <div>
-                   <label className="form-label !mb-2">Payment Amount (₹)</label>
+                   <label className="form-label !mb-1.5">Payment Amount (₹)</label>
                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">₹</div>
-                      <input type="number" required className="secure-input !h-12 !pl-10 !text-xl font-black bg-slate-50 border-slate-100" placeholder="0.00" value={paymentData.amount || ''} onChange={e => setPaymentData(p => ({ ...p, amount: Number(e.target.value) }))} />
-                   </div>
-                   <div className="mt-2 text-center flex items-center justify-center gap-1.5 opacity-40">
-                      <Info size={10} />
-                      <p className="text-[8px] font-black uppercase tracking-[0.2em]">Limit: ₹{remainingBalance + (editingPayment?.amount || 0)}</p>
+                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-lg">₹</div>
+                      <input type="number" required className="secure-input !h-10 !pl-9 !text-lg font-black bg-slate-50 border-slate-100" placeholder="0" value={paymentData.amount || ''} onChange={e => setPaymentData(p => ({ ...p, amount: Number(e.target.value) }))} />
                    </div>
                 </div>
                 <div>
-                   <label className="form-label !mb-2">Entry Date</label>
+                   <label className="form-label !mb-1.5">Entry Date</label>
                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><Calendar size={18} /></div>
-                      <input type="date" required className="secure-input !h-12 !pl-12 !text-[11px] font-black" value={paymentData.date} onChange={e => setPaymentData(p => ({ ...p, date: e.target.value }))} />
+                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"><Calendar size={14} /></div>
+                      <input type="date" required className="secure-input !h-10 !pl-10 !text-[10px] font-black" value={paymentData.date} onChange={e => setPaymentData(p => ({ ...p, date: e.target.value }))} />
                    </div>
                 </div>
-                <button type="submit" className="primary-btn w-full !h-12 !rounded-2xl text-[10px] shadow-2xl uppercase font-black active:scale-95">Confirm Registry <ArrowRight size={14} strokeWidth={3} /></button>
+                <button type="submit" className="primary-btn w-full !h-11 !rounded-xl text-[9px] shadow-2xl uppercase font-black active:scale-95">Confirm Registry <ArrowRight size={12} strokeWidth={3} /></button>
               </form>
             </motion.div>
           </div>
