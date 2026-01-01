@@ -1,0 +1,7 @@
+{
+  "name": "Family Loan Tracker",
+  "description": "A clean and functional application to manage family loans, lenders, and pending balances with a modern dashboard.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
