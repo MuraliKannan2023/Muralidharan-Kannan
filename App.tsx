@@ -11,6 +11,7 @@ import AddLoan from './pages/AddLoan';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
+import ProfileSettings from './pages/ProfileSettings';
 import Navigation from './components/Navigation';
 import { Lender, Loan } from './types';
 import { translations, Language } from './translations';
@@ -91,6 +92,7 @@ const App: React.FC = () => {
               <Route path="/" element={user ? <Dashboard lenders={lenders} loans={loans} /> : <Navigate to="/login" />} />
               <Route path="/lenders" element={user ? <LenderMaster /> : <Navigate to="/login" />} />
               <Route path="/add-loan" element={user ? <AddLoan lenders={lenders} /> : <Navigate to="/login" />} />
+              <Route path="/profile" element={user ? <ProfileSettings /> : <Navigate to="/login" />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>

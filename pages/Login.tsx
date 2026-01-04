@@ -11,55 +11,26 @@ const AnimatePresence = AnimatePresenceBase as any;
 import { Mail, Lock, ArrowRight, ShieldCheck, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [isEmailValid, setIsEmailValid] = useState(true);
-  const [hasBlurredEmail, setHasBlurredEmail] = useState(false);
-  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   
   const navigate = useNavigate();
-
-  const validateEmail = (emailStr: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(emailStr);
-  };
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setEmail(val);
-    if (hasBlurredEmail) {
-      setIsEmailValid(validateEmail(val));
-    }
-  };
-
-  const handleEmailBlur = () => {
-    setHasBlurredEmail(true);
-    setIsEmailFocused(false);
-    if (email.length > 0) {
-      setIsEmailValid(validateEmail(email));
-    } else {
-      setIsEmailValid(true);
-    }
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
-    const isValid = validateEmail(email);
-    setIsEmailValid(isValid);
-    setHasBlurredEmail(true);
-
-    if (!isValid) {
-      setError("Provide a valid email.");
+    if (!identifier.trim()) {
+      setError("Provide Email or Mobile.");
       return;
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      await signInWithEmailAndPassword(auth, identifier.trim(), password);
       navigate('/');
     } catch (err: any) {
       setError(err.code === 'auth/invalid-credential' ? "Invalid credentials." : "Connection failed.");
@@ -97,34 +68,22 @@ const Login: React.FC = () => {
 
         <form onSubmit={handleLogin} className="w-full space-y-3 flex flex-col items-center">
           <div className="w-full">
-            <div className="flex justify-between items-center mb-1 px-1">
-              <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Email Address</label>
-              <AnimatePresence>
-                {hasBlurredEmail && !isEmailValid && email.length > 0 && (
-                  <motion.span 
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="text-[6px] font-black text-red-500 uppercase tracking-widest"
-                  >
-                    Invalid
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </div>
+            <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1 block px-1">Email or Mobile</label>
             <div className="relative group">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20">
-                <div className={`tactile-icon !w-7 !h-7 ${isEmailFocused || email.length > 0 ? (hasBlurredEmail && !isEmailValid ? 'error' : 'active') : 'text-slate-300 shadow-none bg-slate-50 border border-slate-100'}`}>
+                <div className={`tactile-icon !w-7 !h-7 ${isFocused || identifier.length > 0 ? 'active' : 'text-slate-300 shadow-none bg-slate-50 border border-slate-100'}`}>
                    <Mail size={12} strokeWidth={2.5} />
                 </div>
               </div>
               <input 
-                type="email" 
+                type="text" 
                 required 
-                className={`secure-input !h-[2.6rem] !pl-[3.5rem] !text-[12px] !rounded-[0.8rem] ${hasBlurredEmail && !isEmailValid ? 'invalid' : ''}`}
-                placeholder="money@kaasu.com"
-                value={email}
-                onFocus={() => setIsEmailFocused(true)}
-                onBlur={handleEmailBlur}
-                onChange={handleEmailChange}
+                className="secure-input !h-[2.6rem] !pl-[3.5rem] !text-[12px] !rounded-[0.8rem]"
+                placeholder="Mobile or Email ID"
+                value={identifier}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                onChange={(e) => setIdentifier(e.target.value)}
               />
             </div>
           </div>

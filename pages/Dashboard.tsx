@@ -211,56 +211,91 @@ const Dashboard: React.FC<DashboardProps> = ({ loans, lenders }) => {
         </div>
       </div>
 
-      {/* REFINED COMPACT History Modal */}
+      {/* REFINED History Modal with Optimized Header Layout */}
       <AnimatePresence>
         {isHistoryModalOpen && selectedLoan && (
           <div className="modal-overlay" onClick={() => setIsHistoryModalOpen(false)}>
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} onClick={(e: any) => e.stopPropagation()} className="modal-content !max-w-[380px] !p-0 overflow-hidden !rounded-[3rem] border-0 shadow-3xl max-h-[75vh] flex flex-col">
-              <div className="bg-[#0f172a] p-5 pb-3 text-white relative shrink-0">
-                <div className="flex justify-between items-start mb-3 relative z-10">
-                  <div className="tactile-icon active !w-10 !h-10 !rounded-xl bg-emerald-500 shadow-lg border-0"><ReceiptIndianRupee size={18} strokeWidth={2.5} /></div>
-                  <button onClick={() => setIsHistoryModalOpen(false)} className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all active:scale-95"><X size={14} strokeWidth={3} /></button>
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }} 
+              exit={{ scale: 0.95, opacity: 0 }} 
+              onClick={(e: any) => e.stopPropagation()} 
+              className="modal-content !max-w-[400px] !p-0 overflow-hidden !rounded-[3.2rem] border-0 shadow-3xl max-h-[85vh] flex flex-col"
+            >
+              {/* Refined Header Design */}
+              <div className="bg-[#0f172a] p-6 pb-5 text-white relative shrink-0">
+                <div className="flex justify-between items-start mb-4 relative z-10">
+                  <div className="flex items-center gap-4">
+                    <div className="tactile-icon active !w-12 !h-12 !rounded-2xl bg-emerald-500 shadow-lg border-white/10 shrink-0">
+                      <ReceiptIndianRupee size={22} strokeWidth={2.5} />
+                    </div>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h2 className="text-[20px] font-black tracking-tighter truncate leading-none lowercase">
+                          {selectedLoan.lenderName}
+                        </h2>
+                        <div className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                          <span className="text-[6px] font-black text-emerald-400 uppercase tracking-[0.15em]">ACTIVE ACCOUNT</span>
+                        </div>
+                      </div>
+                      <p className="text-[7px] font-black text-slate-500 uppercase tracking-[0.25em]">Registry ID: #{selectedLoan.id.slice(-4).toUpperCase()}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsHistoryModalOpen(false)} className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all active:scale-90 border border-white/10">
+                    <X size={16} strokeWidth={3} />
+                  </button>
                 </div>
+
                 <div className="relative z-10 px-1">
-                  <h2 className="text-xl font-black tracking-tighter truncate leading-none lowercase mb-1">{selectedLoan.lenderName}</h2>
-                  <div className="inline-block px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[6px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-3">ACTIVE ACCOUNT</div>
-                  <div className="p-3.5 bg-[#1e293b]/50 backdrop-blur-xl rounded-[1.8rem] border border-white/5 shadow-2xl">
-                    <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5">Balance Amount</p>
-                    <p className="text-2xl font-black tracking-tighter text-emerald-400 leading-none">₹{(selectedLoan.totalAmount - (selectedLoan.paidAmount || 0)).toLocaleString('en-IN')}</p>
+                  <div className="p-4 bg-[#1e293b]/50 backdrop-blur-xl rounded-[2rem] border border-white/5 shadow-2xl flex items-center justify-between">
+                    <div>
+                      <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Pending Balance</p>
+                      <p className="text-3xl font-black tracking-tighter text-emerald-400 leading-none">
+                        ₹{(selectedLoan.totalAmount - (selectedLoan.paidAmount || 0)).toLocaleString('en-IN')}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[6px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Total Limit</p>
+                      <p className="text-xs font-black text-slate-300">₹{selectedLoan.totalAmount.toLocaleString('en-IN')}</p>
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <div className="p-5 bg-white flex flex-col flex-grow min-h-0">
-                <div className="flex justify-between items-center mb-3 shrink-0 px-0.5">
-                  <div className="flex items-center gap-1.5">
-                    <History size={12} className="text-slate-300" />
-                    <span className="text-[8px] font-black uppercase tracking-[0.15em] text-slate-900">Recent History</span>
+              <div className="p-6 bg-white flex flex-col flex-grow min-h-0">
+                <div className="flex justify-between items-center mb-4 shrink-0 px-1">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-slate-50 rounded-lg text-slate-300">
+                      <History size={14} strokeWidth={2.5} />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-900">Recent History</span>
                   </div>
-                  <button onClick={() => setIsAddPaymentFormOpen(true)} className="primary-btn !h-7 !rounded-lg !px-3 text-[7px] shadow-emerald-500/20">
-                    <Plus size={10} strokeWidth={3} /> RECORD PAYMENT
+                  <button onClick={() => setIsAddPaymentFormOpen(true)} className="primary-btn !h-8 !rounded-xl !px-4 text-[8px] shadow-emerald-500/20">
+                    <Plus size={12} strokeWidth={3} /> RECORD PAYMENT
                   </button>
                 </div>
                 
-                <div className="flex-grow overflow-y-auto custom-scrollbar pr-1.5 space-y-2 min-h-0">
+                <div className="flex-grow overflow-y-auto custom-scrollbar pr-1.5 space-y-3 min-h-0">
                   {payments.length === 0 ? (
-                    <div className="py-12 text-center opacity-10 flex flex-col items-center">
-                      <ArrowDownCircle size={28} className="mb-2" />
-                      <p className="text-[8px] font-black uppercase tracking-widest">No History Yet</p>
+                    <div className="py-16 text-center opacity-10 flex flex-col items-center">
+                      <ArrowDownCircle size={40} strokeWidth={1} className="mb-4" />
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em]">No Activity Recorded</p>
                     </div>
                   ) : (
                     payments.map(p => (
-                      <div key={p.id} className="flex justify-between items-center p-3 bg-slate-50/50 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all group">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-emerald-500 shadow-sm"><Zap size={12} fill="currentColor" /></div>
+                      <div key={p.id} className="flex justify-between items-center p-4 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-all group">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-110 transition-transform">
+                            <Zap size={16} fill="currentColor" strokeWidth={0} />
+                          </div>
                           <div>
-                            <p className="text-[11px] font-black text-slate-900">₹{p.amount.toLocaleString('en-IN')}</p>
-                            <p className="text-[6px] font-bold text-slate-400 uppercase tracking-widest">{new Date(p.date).toLocaleDateString('en-GB')} • {p.note || 'RE'}</p>
+                            <p className="text-[13px] font-black text-slate-900 tracking-tight">₹{p.amount.toLocaleString('en-IN')}</p>
+                            <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">{new Date(p.date).toLocaleDateString('en-GB')} • {p.note || 'RE'}</p>
                           </div>
                         </div>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => { setEditingPayment(p); setPaymentData({ amount: p.amount, date: p.date, note: p.note || '' }); setIsAddPaymentFormOpen(true); }} className="p-1 text-slate-300 hover:text-emerald-600"><Edit3 size={11} /></button>
-                          <button onClick={() => handleDeletePayment(p)} className="p-1 text-slate-300 hover:text-red-500"><Trash2 size={11} /></button>
+                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                          <button onClick={() => { setEditingPayment(p); setPaymentData({ amount: p.amount, date: p.date, note: p.note || '' }); setIsAddPaymentFormOpen(true); }} className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-emerald-600 transition-colors shadow-sm"><Edit3 size={13} /></button>
+                          <button onClick={() => handleDeletePayment(p)} className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors shadow-sm"><Trash2 size={13} /></button>
                         </div>
                       </div>
                     ))

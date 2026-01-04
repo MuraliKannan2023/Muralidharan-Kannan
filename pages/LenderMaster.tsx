@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { auth, db, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, where } from '../firebase';
-import { User, Phone, MapPin, Trash2, Edit3, X, Image as ImageIcon, Plus, Search, UserRound, UserCheck, Landmark, ShieldCheck, Zap } from 'lucide-react';
-// Fix: Bypassing framer-motion type errors by casting to any
+import { User, Phone, MapPin, Trash2, Edit3, X, Image as ImageIcon, Plus, Search, UserRound, UserCheck, Landmark, ShieldCheck, Zap, Camera } from 'lucide-react';
+// Fix: Bypassing framer-motion type errors by casting the module to any
 import { motion as motionBase, AnimatePresence as AnimatePresenceBase } from 'framer-motion';
 const motion = motionBase as any;
 const AnimatePresence = AnimatePresenceBase as any;
@@ -15,6 +15,7 @@ const LenderMaster: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingLender, setEditingLender] = useState<Lender | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [focusedField, setFocusedField] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -46,21 +47,15 @@ const LenderMaster: React.FC = () => {
       img.src = base64Str;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 200;
-        const MAX_HEIGHT = 200;
+        const MAX_WIDTH = 120;
+        const MAX_HEIGHT = 120;
         let width = img.width;
         let height = img.height;
 
         if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
+          if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
         } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
+          if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
         }
         canvas.width = width;
         canvas.height = height;
@@ -87,6 +82,7 @@ const LenderMaster: React.FC = () => {
     setFormData({ name: '', phone: '', address: '', type: LoanType.INDIVIDUAL, imageUrl: '' });
     setEditingLender(null);
     setIsFormOpen(false);
+    setFocusedField(null);
   };
 
   const handleEdit = (lender: Lender) => {
@@ -146,30 +142,30 @@ const LenderMaster: React.FC = () => {
     <div className="space-y-6 pb-24 px-2 sm:px-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="bg-emerald-600 p-3 rounded-2xl text-white shadow-xl shadow-emerald-500/30 ring-4 ring-white">
-            <ShieldCheck size={24} strokeWidth={2.5} />
+          <div className="bg-emerald-600 p-2.5 rounded-[1.2rem] text-white shadow-lg shadow-emerald-500/20 ring-4 ring-white">
+            <ShieldCheck size={22} strokeWidth={2.5} />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
-              {t.capitalNexus.split(' ')[0]} <span className="text-emerald-500">{t.capitalNexus.split(' ')[1]}.</span>
+            <h1 className="text-xl font-black text-slate-900 tracking-tight leading-none">
+              Lender <span className="text-emerald-500">List.</span>
             </h1>
-            <p className="text-slate-400 font-black text-[9px] uppercase tracking-[0.25em] mt-2">{t.registryCaption}</p>
+            <p className="text-slate-400 font-black text-[7px] uppercase tracking-[0.25em] mt-1.5">{t.registryCaption}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-500 transition-colors" size={14} />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-500 transition-colors" size={12} />
             <input 
               type="text" 
               placeholder="Locate lender..." 
-              className="secure-input !h-10 w-44 sm:w-60 !pl-10 !text-[11px] bg-white border-slate-100 shadow-sm"
+              className="secure-input !h-9 w-40 sm:w-56 !pl-9 !text-[10px] bg-white border-slate-100 shadow-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <button onClick={() => setIsFormOpen(true)} className="primary-btn !h-10 px-6 shadow-emerald-500/20">
-            <Plus size={14} strokeWidth={3} /> {t.register.toUpperCase()}
+          <button onClick={() => setIsFormOpen(true)} className="primary-btn !h-9 px-5 !rounded-[0.8rem] shadow-emerald-500/20">
+            <Plus size={14} strokeWidth={3} /> CREATE LENDER
           </button>
         </div>
       </div>
@@ -178,114 +174,138 @@ const LenderMaster: React.FC = () => {
         {isFormOpen && (
           <div className="modal-overlay" onClick={resetForm}>
             <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              initial={{ scale: 0.97, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              exit={{ scale: 0.97, opacity: 0, y: 10 }}
               onClick={(e: any) => e.stopPropagation()}
-              className="modal-content !max-w-[400px]"
+              className="modal-content !max-w-[400px] !p-7 bg-white border-t border-l border-slate-100 border-r-[8px] border-b-[12px] border-emerald-500/10 rounded-[2.8rem] shadow-[0_40px_80px_-15px_rgba(16,185,129,0.18)] flex flex-col items-start relative overflow-visible"
             >
-              <button onClick={resetForm} className="absolute top-6 right-6 p-2 text-slate-300 hover:text-emerald-500 transition-all z-50">
+              <button onClick={resetForm} className="absolute top-6 right-6 p-1.5 text-slate-300 hover:text-emerald-500 transition-all z-50">
                 <X size={20} strokeWidth={3} />
               </button>
 
-              <div className="flex items-center gap-4 mb-8">
-                <div className="bg-emerald-500 p-3 rounded-2xl text-white shadow-lg shadow-emerald-500/20">
-                  <UserCheck size={22} strokeWidth={2.5} />
+              {/* Optimized Horizontal Header */}
+              <div className="flex items-center gap-4 mb-5 w-full pr-8">
+                <div className="w-12 h-12 bg-emerald-600 rounded-[1.2rem] text-white flex items-center justify-center shadow-[0_4px_0_#059669] ring-4 ring-white shrink-0">
+                  <UserCheck size={26} strokeWidth={2.5} />
                 </div>
-                <div>
-                  <h2 className="text-xl font-black text-slate-900 tracking-tight leading-none">{editingLender ? 'Update' : t.register} Lender</h2>
-                  <p className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mt-1">Identity & Classification</p>
+                <div className="flex flex-col">
+                  <h2 className="text-[22px] font-black text-slate-900 tracking-tighter leading-none mb-1.5">
+                     {editingLender ? 'Update' : 'Create'} <span className="text-emerald-500">Lender.</span>
+                  </h2>
+                  <div className="inline-flex px-2 py-0.5 bg-emerald-50 rounded-full border border-emerald-100/50 w-fit">
+                    <p className="text-[#10b981] font-black uppercase text-[6px] tracking-[0.2em]">IDENTITY & CLASSIFICATION</p>
+                  </div>
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="flex justify-center mb-4">
+              <form onSubmit={handleSubmit} className="w-full space-y-4">
+                {/* Profile Pic - Compact and Integrated */}
+                <div className="flex items-center gap-4 mb-2 p-3 bg-slate-50/50 rounded-[1.5rem] border border-slate-100">
                   <div 
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-20 h-20 rounded-[2rem] bg-slate-50 border-4 border-white shadow-xl flex items-center justify-center cursor-pointer hover:rotate-3 transition-all overflow-hidden group relative ring-2 ring-emerald-500/5"
+                    className="relative group cursor-pointer"
                   >
-                    {formData.imageUrl ? (
-                      <img src={formData.imageUrl} className="w-full h-full object-cover" alt="lender" />
-                    ) : (
-                      <ImageIcon size={24} className="text-slate-200" />
-                    )}
-                    <div className="absolute inset-0 bg-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                       <Plus size={16} className="text-emerald-600" />
+                    <div className="w-16 h-16 rounded-[1.2rem] bg-white border-2 border-white shadow-md flex items-center justify-center transition-all overflow-hidden ring-1 ring-slate-100">
+                      {formData.imageUrl ? (
+                        <img src={formData.imageUrl} className="w-full h-full object-cover" alt="lender" />
+                      ) : (
+                        <ImageIcon size={22} className="text-slate-200" />
+                      )}
                     </div>
+                    <div className="absolute -bottom-1 -right-1 bg-[#10b981] text-white p-1.5 rounded-lg shadow-md border border-white">
+                       <Camera size={10} strokeWidth={3} />
+                    </div>
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
                   </div>
-                  <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="form-label">Category Selection</label>
-                    <div className="flex bg-slate-50/80 p-1.5 rounded-2xl gap-2 border border-slate-100">
+                  <div className="flex-1">
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Quick Identity</p>
+                    <div className="flex bg-white p-1 rounded-xl gap-1 border border-slate-100 shadow-sm">
                       <button 
                         type="button" 
                         onClick={() => setFormData(prev => ({ ...prev, type: LoanType.BANK }))} 
-                        className={`flex-1 py-2 rounded-xl font-black text-[8px] uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 ${formData.type === LoanType.BANK ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400'}`}
+                        className={`flex-1 py-1 rounded-lg font-black text-[7px] uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 ${formData.type === LoanType.BANK ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400'}`}
                       >
-                        <Landmark size={12} /> Institutional
+                        <Landmark size={10} /> Institutional
                       </button>
                       <button 
                         type="button" 
                         onClick={() => setFormData(prev => ({ ...prev, type: LoanType.INDIVIDUAL }))} 
-                        className={`flex-1 py-2 rounded-xl font-black text-[8px] uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 ${formData.type === LoanType.INDIVIDUAL ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400'}`}
+                        className={`flex-1 py-1 rounded-lg font-black text-[7px] uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 ${formData.type === LoanType.INDIVIDUAL ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400'}`}
                       >
-                        <UserRound size={12} /> Personal
+                        <UserRound size={10} /> Personal
                       </button>
                     </div>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="form-label">{t.officialName}</label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500">
-                         <User size={16} />
+                <div className="space-y-3">
+                  {/* Name Input */}
+                  <div className="w-full">
+                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 block px-1">Provider Name</label>
+                    <div className="relative group">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20">
+                        <div className={`tactile-icon !w-7 !h-7 ${focusedField === 'name' || formData.name.length > 0 ? 'active' : 'text-slate-300 shadow-none bg-slate-50 border border-slate-100'}`}>
+                           <User size={12} strokeWidth={3} />
+                        </div>
                       </div>
                       <input 
-                        type="text" required className="secure-input !h-11 !pl-11" 
+                        type="text" required 
+                        className="secure-input !h-[2.8rem] !pl-[3.5rem] !text-[12px] !rounded-[0.9rem]"
                         placeholder="e.g. Murali Kannan" 
                         value={formData.name} 
+                        onFocus={() => setFocusedField('name')}
+                        onBlur={() => setFocusedField(null)}
                         onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))} 
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="form-label">{t.phone}</label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500">
-                         <Phone size={16} />
+                  {/* Mobile Input */}
+                  <div className="w-full">
+                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 block px-1">Contact Access</label>
+                    <div className="relative group">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20">
+                        <div className={`tactile-icon !w-7 !h-7 ${focusedField === 'phone' || formData.phone.length > 0 ? 'active' : 'text-slate-300 shadow-none bg-slate-50 border border-slate-100'}`}>
+                           <Phone size={12} strokeWidth={3} />
+                        </div>
                       </div>
                       <input 
-                        type="tel" required className="secure-input !h-11 !pl-11" 
-                        placeholder="8685868666" 
+                        type="tel" required 
+                        className="secure-input !h-[2.8rem] !pl-[3.5rem] !text-[12px] !rounded-[0.9rem]"
+                        placeholder="+91 86586 58686" 
                         value={formData.phone} 
+                        onFocus={() => setFocusedField('phone')}
+                        onBlur={() => setFocusedField(null)}
                         onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} 
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="form-label">{t.address}</label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-3.5 text-emerald-500">
-                         <MapPin size={16} />
+                  {/* Address Input */}
+                  <div className="w-full">
+                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 block px-1">Location / Address</label>
+                    <div className="relative group">
+                      <div className="absolute left-3 top-3 z-20">
+                        <div className={`tactile-icon !w-7 !h-7 ${focusedField === 'address' || formData.address.length > 0 ? 'active' : 'text-slate-300 shadow-none bg-slate-50 border border-slate-100'}`}>
+                           <MapPin size={12} strokeWidth={3} />
+                        </div>
                       </div>
                       <textarea 
-                        className="secure-input min-h-[60px] !py-3 !pl-11 resize-none leading-relaxed text-[11px]" 
-                        placeholder="Address details..." 
+                        className="secure-input min-h-[60px] !py-3 !pl-[3.5rem] !pr-3 resize-none leading-relaxed !text-[11px] !rounded-[0.9rem]" 
+                        placeholder="Enter full address details..." 
                         value={formData.address} 
+                        onFocus={() => setFocusedField('address')}
+                        onBlur={() => setFocusedField(null)}
                         onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))} 
                       />
                     </div>
                   </div>
                 </div>
 
-                <button disabled={submitting} type="submit" className="primary-btn w-full mt-2 !h-[3.4rem]">
-                  {submitting ? 'COMMITTING...' : t.establishRecord.toUpperCase()}
-                  <Zap size={14} className="ml-1" />
+                <button disabled={submitting} type="submit" className="primary-btn w-full !h-[3rem] !rounded-[1rem] shadow-[0_5px_0_#059669] active:translate-y-[3px] active:shadow-none mt-2">
+                  <span className="text-[11px] font-black tracking-[0.2em] uppercase">{submitting ? 'COMMITTING...' : 'ADD LENDER'}</span>
+                  <Zap size={14} strokeWidth={3} className="ml-1" />
                 </button>
               </form>
             </motion.div>
@@ -309,7 +329,6 @@ const LenderMaster: React.FC = () => {
               key={lender.id}
               className="bg-white rounded-[2rem] shadow-lg shadow-emerald-900/5 border border-white/50 flex flex-col overflow-hidden group hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 relative"
             >
-              {/* Card Body */}
               <div className="p-5 flex flex-col items-center text-center">
                 <div className="relative mb-4">
                   <div className="w-20 h-20 rounded-[1.8rem] p-1 bg-gradient-to-tr from-emerald-100 to-white shadow-inner">
@@ -337,7 +356,6 @@ const LenderMaster: React.FC = () => {
                 </div>
               </div>
               
-              {/* Hover Actions */}
               <div className="flex border-t border-slate-50 mt-auto bg-slate-50/30">
                 <button 
                   onClick={() => handleEdit(lender)} 

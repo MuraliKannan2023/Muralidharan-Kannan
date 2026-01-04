@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 // Fix: Bypassing react-router-dom type errors by casting the module to any
 import * as ReactRouterDOM from 'react-router-dom';
-const { NavLink, useNavigate } = ReactRouterDOM as any;
+const { NavLink, useNavigate, Link } = ReactRouterDOM as any;
 import { signOut, getFullDatabase, auth } from '../firebase';
-import { LayoutDashboard, ListTodo, LogOut, Languages, User, Landmark, Download, CheckCircle } from 'lucide-react';
+import { LayoutDashboard, ListTodo, LogOut, Languages, User, Landmark, Download, CheckCircle, Settings as SettingsIcon, ChevronDown } from 'lucide-react';
 import { useTranslation } from '../App';
 // Fix: Bypassing framer-motion type errors by casting to any
 import { motion as motionBase, AnimatePresence as AnimatePresenceBase } from 'framer-motion';
@@ -15,6 +15,18 @@ const Navigation: React.FC<{ user: any }> = ({ user }) => {
   const navigate = useNavigate();
   const { lang, setLang, t } = useTranslation();
   const [showToast, setShowToast] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
     await signOut();
@@ -92,7 +104,6 @@ const Navigation: React.FC<{ user: any }> = ({ user }) => {
         </div>
         
         <div className="flex items-center gap-3">
-          {/* 3D TACTILE DOWNLOAD ICON */}
           <button 
             onClick={handleDownloadReport}
             className="tactile-icon active !w-11 !h-11 !rounded-2xl bg-emerald-500 text-white shadow-[0_10px_20px_-5px_rgba(16,185,129,0.4)] border-white/20 hover:scale-110 active:scale-95 transition-all"
@@ -109,15 +120,56 @@ const Navigation: React.FC<{ user: any }> = ({ user }) => {
             {lang === 'en' ? 'தமிழ்' : 'ENGLISH'}
           </button>
 
-          <div className="flex items-center gap-3 ml-4">
-            <div className="w-10 h-10 rounded-full border-2 border-emerald-500 p-0.5 relative overflow-hidden bg-slate-50">
-              {user?.photoURL ? (
-                <img src={user.photoURL} className="w-full h-full object-cover rounded-full" alt="profile" />
-              ) : (
-                <div className="w-full h-full bg-slate-50 rounded-full flex items-center justify-center text-emerald-600"><User size={20} /></div>
+          <div className="flex items-center gap-2 ml-4 relative" ref={menuRef}>
+            <button 
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center gap-3 p-1.5 pr-4 bg-slate-50/50 rounded-full border border-slate-100 hover:bg-white hover:border-emerald-200 transition-all active:scale-95 group"
+            >
+              <div className="w-10 h-10 rounded-full border-2 border-emerald-500 p-0.5 relative overflow-hidden bg-slate-100 flex items-center justify-center">
+                {user?.photoURL ? (
+                  <img src={user.photoURL} className="w-full h-full object-cover rounded-full" alt="profile" />
+                ) : (
+                  <User size={20} className="text-emerald-600" />
+                )}
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="text-[10px] font-black text-slate-900 leading-none">{user?.displayName || 'User Account'}</span>
+                <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Verified</span>
+              </div>
+              <ChevronDown size={14} className={`text-slate-300 transition-transform duration-300 ${showUserMenu ? 'rotate-180 text-emerald-500' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {showUserMenu && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute top-14 right-0 w-52 bg-white rounded-[2rem] shadow-2xl border border-emerald-50 p-2 z-[60]"
+                >
+                  <Link 
+                    to="/profile" 
+                    onClick={() => setShowUserMenu(false)}
+                    className="flex items-center gap-3 p-3.5 rounded-[1.5rem] hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 transition-all font-black text-[9px] uppercase tracking-widest group"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                      <SettingsIcon size={14} />
+                    </div>
+                    Vault Settings
+                  </Link>
+                  <div className="h-px bg-slate-50 mx-4 my-1"></div>
+                  <button 
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 p-3.5 rounded-[1.5rem] hover:bg-red-50 text-slate-600 hover:text-red-600 transition-all font-black text-[9px] uppercase tracking-widest group text-left"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-red-500 group-hover:text-white transition-all">
+                      <LogOut size={14} />
+                    </div>
+                    Secure Exit
+                  </button>
+                </motion.div>
               )}
-            </div>
-            <button onClick={handleLogout} className="p-3 text-slate-300 hover:text-red-500 transition-all"><LogOut size={20} /></button>
+            </AnimatePresence>
           </div>
         </div>
       </nav>
@@ -129,9 +181,9 @@ const Navigation: React.FC<{ user: any }> = ({ user }) => {
               <Icon size={22} strokeWidth={2.5} />
             </NavLink>
           ))}
-          <button onClick={handleDownloadReport} className="p-4 rounded-2xl text-emerald-500">
-            <Download size={22} strokeWidth={2.5} />
-          </button>
+          <NavLink to="/profile" className={({ isActive }: any) => `p-4 rounded-2xl transition-all ${isActive ? 'bg-emerald-500 text-white' : 'text-slate-400'}`}>
+            <SettingsIcon size={22} strokeWidth={2.5} />
+          </NavLink>
       </div>
 
       <AnimatePresence>
