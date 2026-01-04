@@ -102,7 +102,7 @@ const LenderMaster: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("ERASE THIS SOURCE?")) {
+    if (window.confirm("ERASE THIS LENDER?")) {
       try {
         await deleteDoc(doc(db, "lenders", id));
       } catch (err) {
@@ -162,7 +162,7 @@ const LenderMaster: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-500 transition-colors" size={14} />
             <input 
               type="text" 
-              placeholder="Locate source..." 
+              placeholder="Locate lender..." 
               className="secure-input !h-10 w-44 sm:w-60 !pl-10 !text-[11px] bg-white border-slate-100 shadow-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -193,7 +193,7 @@ const LenderMaster: React.FC = () => {
                   <UserCheck size={22} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-slate-900 tracking-tight leading-none">{editingLender ? 'Update' : t.register} Source</h2>
+                  <h2 className="text-xl font-black text-slate-900 tracking-tight leading-none">{editingLender ? 'Update' : t.register} Lender</h2>
                   <p className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mt-1">Identity & Classification</p>
                 </div>
               </div>
@@ -284,7 +284,7 @@ const LenderMaster: React.FC = () => {
                 </div>
 
                 <button disabled={submitting} type="submit" className="primary-btn w-full mt-2 !h-[3.4rem]">
-                  {submitting ? 'COMMITTING...' : t.authorise.toUpperCase()}
+                  {submitting ? 'COMMITTING...' : t.establishRecord.toUpperCase()}
                   <Zap size={14} className="ml-1" />
                 </button>
               </form>
@@ -297,7 +297,7 @@ const LenderMaster: React.FC = () => {
         {filteredLenders.length === 0 ? (
           <div className="col-span-full py-32 text-center opacity-20">
              <Landmark size={64} strokeWidth={1} className="mx-auto mb-4" />
-             <p className="font-black uppercase text-[10px] tracking-[0.5em]">Vault Registry Empty</p>
+             <p className="font-black uppercase text-[10px] tracking-[0.5em]">Lender Registry Empty</p>
           </div>
         ) : (
           filteredLenders.map((lender, idx) => (

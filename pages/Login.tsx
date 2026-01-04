@@ -8,9 +8,7 @@ import { auth, signInWithEmailAndPassword } from '../firebase';
 import { motion as motionBase, AnimatePresence as AnimatePresenceBase } from 'framer-motion';
 const motion = motionBase as any;
 const AnimatePresence = AnimatePresenceBase as any;
-import { Mail, Lock, ArrowRight, Users, AlertCircle, Eye, EyeOff } from 'lucide-react';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useTranslation } from '../App';
+import { Mail, Lock, ArrowRight, ShieldCheck, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -56,7 +54,7 @@ const Login: React.FC = () => {
     setHasBlurredEmail(true);
 
     if (!isValid) {
-      setError("Please provide a valid email address.");
+      setError("Provide a valid email.");
       return;
     }
 
@@ -69,36 +67,43 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 py-2">
+    <div className="h-screen w-full flex flex-col items-center justify-center px-4 overflow-hidden select-none bg-[#f1fcf8]">
       <motion.div 
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="glass-panel w-full max-w-[360px] p-4 md:p-5 border border-slate-100 shadow-2xl flex flex-col items-center"
+        initial={{ opacity: 0, scale: 0.97, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="w-full max-w-[360px] p-6 bg-white border-t border-l border-slate-100 border-r-[8px] border-b-[12px] border-emerald-500/10 rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(16,185,129,0.12)] flex flex-col items-center relative"
       >
-        <div className="flex flex-col items-center mb-3 text-center">
-          <div className="bg-emerald-500 p-2.5 rounded-[1rem] text-white mb-2 shadow-lg shadow-emerald-500/20 transform hover:scale-105 transition-transform">
-            <Users size={24} strokeWidth={2.5} />
+        <div className="flex flex-col items-center mb-4 text-center w-full">
+          <div className="w-14 h-14 bg-[#10b981] rounded-[1.2rem] text-white flex items-center justify-center mb-3 shadow-[0_5px_0_#059669] transform hover:rotate-3 transition-all ring-4 ring-white relative group">
+            <ShieldCheck size={28} strokeWidth={2.5} className="relative z-10" />
+            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.2rem]"></div>
           </div>
-          <h1 className="text-xl font-black text-slate-900 tracking-tighter leading-none">Family <span className="text-emerald-500">Tracker.</span></h1>
-          <p className="text-emerald-500 font-black uppercase text-[7px] tracking-[0.2em] mt-1">Money is always ultimate</p>
+          
+          <h1 className="text-[26px] font-black text-slate-900 tracking-tighter leading-none mb-1">
+            Loan<span className="text-[#10b981]">Tracker.</span>
+          </h1>
+          
+          <div className="inline-flex px-3 py-0.5 bg-emerald-50 rounded-full border border-emerald-100/50">
+            <p className="text-[#10b981] font-black uppercase text-[6px] tracking-[0.3em]">EARN WITH HONESTY</p>
+          </div>
         </div>
 
         {error && (
-          <div className="w-full mb-2 p-2 bg-red-50 text-red-600 rounded-xl text-[8px] font-bold uppercase tracking-wide border border-red-100 text-center flex items-center justify-center gap-1.5">
+          <div className="w-full mb-4 p-2.5 bg-red-50 text-red-600 rounded-xl text-[8px] font-black uppercase tracking-wide border border-red-100 text-center flex items-center justify-center gap-2">
             <AlertCircle size={10} />
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="w-full space-y-2.5">
-          <div>
-            <div className="flex justify-between items-center mb-0 px-1">
-              <label className="form-label mb-0">Email Address</label>
+        <form onSubmit={handleLogin} className="w-full space-y-3 flex flex-col items-center">
+          <div className="w-full">
+            <div className="flex justify-between items-center mb-1 px-1">
+              <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Email Address</label>
               <AnimatePresence>
                 {hasBlurredEmail && !isEmailValid && email.length > 0 && (
                   <motion.span 
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="text-[7px] font-black text-red-500 uppercase tracking-widest"
+                    className="text-[6px] font-black text-red-500 uppercase tracking-widest"
                   >
                     Invalid
                   </motion.span>
@@ -106,15 +111,15 @@ const Login: React.FC = () => {
               </AnimatePresence>
             </div>
             <div className="relative group">
-              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20">
-                <div className={`tactile-icon !w-7 !h-7 ${isEmailFocused || email.length > 0 ? (hasBlurredEmail && !isEmailValid ? 'error' : 'active') : 'text-slate-300'}`}>
-                   <Mail size={13} strokeWidth={2.5} />
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20">
+                <div className={`tactile-icon !w-7 !h-7 ${isEmailFocused || email.length > 0 ? (hasBlurredEmail && !isEmailValid ? 'error' : 'active') : 'text-slate-300 shadow-none bg-slate-50 border border-slate-100'}`}>
+                   <Mail size={12} strokeWidth={2.5} />
                 </div>
               </div>
               <input 
                 type="email" 
                 required 
-                className={`secure-input !h-[2.6rem] !pl-[2.8rem] ${hasBlurredEmail && !isEmailValid ? 'invalid' : ''}`}
+                className={`secure-input !h-[2.6rem] !pl-[3.5rem] !text-[12px] !rounded-[0.8rem] ${hasBlurredEmail && !isEmailValid ? 'invalid' : ''}`}
                 placeholder="money@kaasu.com"
                 value={email}
                 onFocus={() => setIsEmailFocused(true)}
@@ -124,18 +129,18 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          <div>
-            <label className="form-label">Access Pin</label>
+          <div className="w-full">
+            <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1 block px-1">Access Pin</label>
             <div className="relative group">
-              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20">
-                <div className={`tactile-icon !w-7 !h-7 ${isPasswordFocused || password.length > 0 ? 'active' : 'text-slate-300'}`}>
-                   <Lock size={13} strokeWidth={2.5} />
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20">
+                <div className={`tactile-icon !w-7 !h-7 ${isPasswordFocused || password.length > 0 ? 'active' : 'text-slate-300 shadow-none bg-slate-50 border border-slate-100'}`}>
+                   <Lock size={12} strokeWidth={2.5} />
                 </div>
               </div>
               <input 
                 type={showPassword ? "text" : "password"}
                 required 
-                className="secure-input !h-[2.6rem] !pl-[2.8rem] pr-10"
+                className="secure-input !h-[2.6rem] !pl-[3.5rem] pr-10 !text-[12px] !rounded-[0.8rem]"
                 placeholder="••••••••"
                 value={password}
                 onFocus={() => setIsPasswordFocused(true)}
@@ -143,31 +148,32 @@ const Login: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <button 
-                type="button"
+                type="button" 
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-20"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 z-20"
               >
-                <div className={`tactile-icon !h-7 !w-7 ${showPassword ? 'active' : 'text-slate-300'}`}>
-                  {showPassword ? <EyeOff size={11} strokeWidth={2.5} /> : <Eye size={11} strokeWidth={2.5} />}
+                <div className={`tactile-icon !h-6 !w-6 ${showPassword ? 'active' : 'text-slate-300 shadow-none hover:bg-slate-50'}`}>
+                  {showPassword ? <EyeOff size={10} strokeWidth={2.5} /> : <Eye size={10} strokeWidth={2.5} />}
                 </div>
               </button>
             </div>
           </div>
 
-          <div className="flex justify-end px-1">
-            <Link to="/forgot-password" text-emerald-500 className="text-[7px] font-black text-emerald-500 hover:text-emerald-600 uppercase tracking-widest">
+          <div className="flex justify-end w-full px-1 pt-0.5">
+            <Link to="/forgot-password" text-emerald-500 className="text-[8px] font-black text-emerald-500 hover:text-emerald-600 uppercase tracking-widest border-b border-transparent hover:border-emerald-500 transition-all">
               Forgot Pin?
             </Link>
           </div>
 
-          <button className="primary-btn w-full !h-[2.6rem] mt-0.5">
-            Log In Now <ArrowRight size={13} />
+          <button className="primary-btn w-full !h-[2.8rem] !rounded-[0.9rem] mt-3 shadow-[0_4px_0_#059669] hover:shadow-[0_3px_0_#059669] active:translate-y-[3px] active:shadow-none flex items-center justify-center gap-2 group">
+            <span className="text-[11px] font-black tracking-[0.2em] uppercase">LOG IN NOW</span>
+            <ArrowRight size={16} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
 
-        <div className="mt-5 text-center pt-1.5 border-t border-slate-50 w-full">
-          <p className="text-slate-400 text-[8px] font-black uppercase tracking-[0.2em]">
-            New to the Vault? <Link to="/register" className="text-emerald-500 hover:text-emerald-600 transition-colors ml-1.5 border-b-2 border-emerald-500/10">SIGN UP</Link>
+        <div className="mt-5 text-center pt-3.5 border-t border-slate-100 w-full">
+          <p className="text-slate-400 text-[8px] font-black uppercase tracking-[0.18em]">
+            New to the Vault? <Link to="/register" className="text-emerald-500 hover:text-emerald-600 ml-1 border-b border-emerald-500/10 font-black">SIGN UP</Link>
           </p>
         </div>
       </motion.div>

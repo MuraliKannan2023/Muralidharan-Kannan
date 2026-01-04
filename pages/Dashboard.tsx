@@ -1,10 +1,10 @@
 
 import React, { useMemo, useState, useEffect } from 'react';
 import { 
-  UserRound, ShieldCheck, Landmark, Coins, TrendingUp, History, 
-  Wallet, Calendar, ArrowRight, Plus, X, 
+  UserRound, ShieldCheck, Landmark, History, 
+  Wallet, ArrowRight, Plus, X, 
   Trash2, Edit3, ReceiptIndianRupee, 
-  Zap, ArrowDownCircle, Info, AlertCircle, Layers, Banknote
+  Zap, ArrowDownCircle, AlertCircle, Layers, Banknote
 } from 'lucide-react';
 // @ts-ignore
 import { motion, AnimatePresence } from 'framer-motion';
@@ -121,11 +121,11 @@ const Dashboard: React.FC<DashboardProps> = ({ loans, lenders }) => {
       <div className="shrink-0 flex flex-col md:flex-row md:items-end justify-between gap-6 px-2 z-10">
         <div className="space-y-1">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-emerald-500/10 text-emerald-600 px-4 py-1 rounded-full border border-emerald-500/20 inline-flex items-center gap-2 mb-2">
-            <TrendingUp size={12} strokeWidth={3} />
+            <Zap size={12} strokeWidth={3} />
             <span className="text-[10px] font-black uppercase tracking-widest">{t.livePortfolio}</span>
           </motion.div>
-          <h2 className="text-4xl font-black text-slate-900 tracking-tighter leading-none lowercase">
-            {t.financialPulse.split(' ')[0]} <span className="text-emerald-500">{t.financialPulse.split(' ')[1]}.</span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tighter leading-tight">
+            {t.financialPulse.split(' ').slice(0, -1).join(' ')} <span className="text-emerald-500">{t.financialPulse.split(' ').slice(-1)}.</span>
           </h2>
         </div>
         
@@ -140,7 +140,7 @@ const Dashboard: React.FC<DashboardProps> = ({ loans, lenders }) => {
       {/* Stats Grid */}
       <div className="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-5 z-10">
         {[
-          { label: t.totalTaken, value: stats.totalLoan, icon: Coins, highlight: false },
+          { label: t.totalTaken, value: stats.totalLoan, icon: Zap, highlight: false },
           { label: t.totalPaid, value: stats.totalPaid, icon: ShieldCheck, highlight: false },
           { label: t.pending, value: stats.pending, icon: Wallet, highlight: true },
         ].map((item, idx) => (
@@ -149,7 +149,7 @@ const Dashboard: React.FC<DashboardProps> = ({ loans, lenders }) => {
             className={`relative p-6 rounded-[2.5rem] border-2 overflow-hidden transition-all hover:scale-[1.02] cursor-default ${item.highlight ? 'bg-emerald-500 text-white border-emerald-400 shadow-[0_25px_60px_-15px_rgba(16,185,129,0.35)]' : 'bg-white text-slate-900 border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.06)]'}`}
           >
             <div className="flex justify-between items-start mb-10 relative z-10">
-              <div className={`tactile-icon !w-11 !h-11 !rounded-2xl ${item.highlight ? 'bg-white text-emerald-600' : 'bg-emerald-50 text-emerald-600 active'}`}>
+              <div className={`tactile-icon !w-11 !h-11 !rounded-2xl ${item.highlight ? 'bg-white text-emerald-600 shadow-none' : 'bg-emerald-50 text-emerald-600 active'}`}>
                 <item.icon size={20} strokeWidth={2.5} />
               </div>
               <p className={`text-[8px] font-black uppercase tracking-[0.25em] ${item.highlight ? 'text-white/70' : 'text-slate-400'}`}>{item.label}</p>
@@ -280,7 +280,7 @@ const Dashboard: React.FC<DashboardProps> = ({ loans, lenders }) => {
               <div className="flex flex-col items-center mb-6">
                 <div className="tactile-icon active !w-12 !h-12 !rounded-xl mb-3 bg-emerald-500 text-white border-0 shadow-emerald-500/40"><Banknote size={20} strokeWidth={2.5} /></div>
                 <h3 className="text-xl font-black text-slate-900 tracking-tighter leading-none mb-1">Record Entry</h3>
-                <p className="text-[8px] font-black text-emerald-500 uppercase tracking-[0.2em]">{selectedLoan?.lenderName || 'Source Registry'}</p>
+                <p className="text-[8px] font-black text-emerald-500 uppercase tracking-[0.2em]">{selectedLoan?.lenderName || 'Lender Registry'}</p>
               </div>
 
               {formError && (
@@ -298,7 +298,7 @@ const Dashboard: React.FC<DashboardProps> = ({ loans, lenders }) => {
                 <div>
                    <label className="form-label !mb-1.5">Entry Date</label>
                    <div className="relative">
-                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"><Calendar size={14} /></div>
+                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"><History size={14} /></div>
                       <input type="date" required className="secure-input !h-10 !pl-10 !text-[10px] font-black" value={paymentData.date} onChange={e => setPaymentData(p => ({ ...p, date: e.target.value }))} />
                    </div>
                 </div>
